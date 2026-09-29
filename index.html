@@ -18,14 +18,19 @@
             color: white;
             padding: 40px 20px;
             text-align: center;
-            position: sticky;
-            top: 0;
-            z-index: 100;
             box-shadow: 0 4px 20px rgba(0,0,0,0.3);
         }
 
-        header h1 { font-size: 2.5em; margin-bottom: 10px; letter-spacing: 2px; }
-        header p { font-size: 1.1em; opacity: 0.8; }
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+        }
+
+        header p {
+            font-size: 1.1em;
+            opacity: 0.8;
+        }
 
         .search-bar {
             max-width: 500px;
@@ -58,6 +63,9 @@
             padding: 20px;
             background: white;
             box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 50;
         }
 
         .cat-btn {
@@ -169,42 +177,29 @@
         .price-section {
             display: flex;
             align-items: center;
-            justify-content: space-between;
+            justify-content: center;
             margin-top: auto;
             padding-top: 15px;
             border-top: 1px solid #eee;
         }
 
-        .price-block { display: flex; flex-direction: column; }
+        .price-block {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
 
         .price-old {
-            font-size: 0.95em;
+            font-size: 1em;
             color: #999;
             text-decoration: line-through;
             font-weight: 400;
         }
 
         .price {
-            font-size: 1.6em;
+            font-size: 1.8em;
             font-weight: 800;
             color: #e63946;
-        }
-
-        .btn-order {
-            padding: 12px 28px;
-            background: linear-gradient(135deg, #0f3460, #1a1a2e);
-            color: white;
-            border: none;
-            border-radius: 25px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 600;
-            transition: all 0.3s;
-        }
-
-        .btn-order:hover {
-            background: linear-gradient(135deg, #e63946, #c1121f);
-            transform: scale(1.05);
         }
 
         .badge {
@@ -242,64 +237,6 @@
             .products-grid { grid-template-columns: 1fr; }
             .cat-btn { padding: 8px 16px; font-size: 12px; }
         }
-
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-
-        .modal.active { display: flex; }
-
-        .modal-content {
-            background: white;
-            border-radius: 16px;
-            max-width: 500px;
-            width: 100%;
-            padding: 30px;
-            text-align: center;
-        }
-
-        .modal-content h3 { margin-bottom: 15px; color: #1a1a2e; }
-
-        .modal-content input, .modal-content textarea {
-            width: 100%;
-            padding: 12px;
-            margin: 8px 0;
-            border: 2px solid #eee;
-            border-radius: 10px;
-            font-size: 15px;
-            outline: none;
-        }
-
-        .modal-content input:focus, .modal-content textarea:focus { border-color: #0f3460; }
-
-        .modal-content button {
-            margin-top: 15px;
-            padding: 12px 40px;
-            background: #0f3460;
-            color: white;
-            border: none;
-            border-radius: 25px;
-            font-size: 16px;
-            cursor: pointer;
-            font-weight: 600;
-        }
-
-        .modal-close {
-            float: right;
-            font-size: 24px;
-            cursor: pointer;
-            color: #999;
-            background: none;
-            border: none;
-        }
     </style>
 </head>
 <body>
@@ -312,7 +249,7 @@
     </div>
 </header>
 
-<div class="categories">
+<div class="categories" id="categories">
     <button class="cat-btn active" onclick="filterCategory('all', this)">Все товары</button>
     <button class="cat-btn" onclick="filterCategory('vacuum', this)">Пылесосы</button>
     <button class="cat-btn" onclick="filterCategory('tool', this)">Электроинструмент</button>
@@ -323,18 +260,6 @@
 
 <div class="container">
     <div class="products-grid" id="productsGrid"></div>
-</div>
-
-<div class="modal" id="orderModal">
-    <div class="modal-content">
-        <button class="modal-close" onclick="closeModal()">&times;</button>
-        <h3>Оформить заказ</h3>
-        <p id="modalProductName" style="margin-bottom:15px; color:#0f3460; font-weight:600;"></p>
-        <input type="text" placeholder="Ваше имя">
-        <input type="tel" placeholder="Телефон">
-        <textarea placeholder="Комментарий к заказу" rows="3"></textarea>
-        <button onclick="submitOrder()">Отправить заказ</button>
-    </div>
 </div>
 
 <footer>
@@ -376,7 +301,7 @@ const products = [
         badgeText: "МОЩНЫЙ",
         image: "dry-clean-vacuum.jpg",
         desc: "Очень мощный пылесос для химчистки, имеет 32000 мощность всасывания, очищает до 8см в глубину, при этом он очень лёгкий — всего 3.5кг. Насадки: моющая, для сухой уборки, для шерсти, для стёкол, для самоочистки и для щелей.",
-        price: "449.99"
+        price: "449.99р"
     },
     {
         id: 5,
@@ -418,7 +343,7 @@ const products = [
         badgeText: "СУБРЕНД",
         image: "circular-saw-makita.jpg",
         desc: "Инструмент довольно компактный, имеет вес 4,0 кг. Мощный двигатель 1200 Вт надёжно защищён от перегрева и попадания пыли. Вращение шпинделя на холостом ходу достигает высокой скорости 5200 оборотов в минуту.",
-        price: "359.99"
+        price: "359.99р"
     },
     {
         id: 9,
@@ -473,16 +398,6 @@ const products = [
         image: "chain-saw-makita.jpg",
         desc: "Аккумуляторная цепная пила с 12-дюймовой шиной. Комплект: 2 батареи 48В, зарядное устройство, цепь и кейс. Макс. обороты холостого хода 6800 об/мин. Бесщёточный двигатель экономит энергию и продлевает срок службы.",
         price: "329.99р"
-    },
-    {
-        id: 14,
-        title: "Лобзик",
-        category: "tool",
-        hasDiscount: true,
-        oldPrice: "619.99р",
-        image: "jigsaw.jpg",
-        desc: "Для распила дерева, фанеры, ДСП, пластика и тонкого металла. Глубина пропила: дерево до 65мм, сталь до 6мм. Электронная регулировка скорости от 500 до 3000 ход/мин. 4 режима маятникового хода. Быстрозажимной патрон SDS. Наклон подошвы 0°–45°. 100% медная обмотка двигателя.",
-        price: "309.99р"
     },
     {
         id: 15,
@@ -570,7 +485,7 @@ const products = [
         badgeText: "МОЩНАЯ",
         hasDiscount: true,
         oldPrice: "799.99р",
-        image: "meat-grinder.jpg",
+        image: "meat-grinder-luma.jpg",
         desc: "<ul><li>Мощность 3000 Вт</li><li>Медный двигатель с защитой от перегрузок</li><li>Производительность: до 2 кг фарша в минуту</li><li>Корпус: ударопрочный пластик + нержавеющая сталь</li><li>Механическое управление (вкл/выкл + Реверс)</li><li>Диски для фарша разной консистенции, насадки для колбас и кебабов</li></ul>",
         price: "399.99р"
     },
@@ -580,7 +495,7 @@ const products = [
         category: "kitchen",
         image: "electric-grill.jpg",
         desc: "Предназначен для приготовления стейков. Антипригарное покрытие позволяет готовить без масла. Рабочая поверхность гриля изготовлена из металла. Series Wizard AID, 2000Вт.",
-        price: "209.99"
+        price: "219.99"
     },
     {
         id: 24,
@@ -590,17 +505,19 @@ const products = [
         badgeText: "ВЫГОДНО",
         hasDiscount: true,
         oldPrice: "149.99р",
-        image: "coffee-grinder.jpg",
-        desc: "Прочный пластиковый корпус с металлической чашей и лезвием из нержавеющей стали. Удобная кнопка вкл/выкл. Прозрачная крышка. 150Вт. Подходит для помола кофе, сахара, специй и других ингредиентов.",
+        image: "coffee-grinder-nima.jpg",
+        desc: "Устройство выполнено в прочном пластиковом корпусе, который гармонично сочетается с металлической чашей и лезвием из нержавеющей стали. На передней панели расположена удобная кнопка включения/выключения. Прозрачная крышка надёжно блокируется. 150Вт. Подходит для помола кофе, сахара, специй и других ингредиентов.",
         price: "74.99р"
     },
     {
         id: 25,
-        title: "Электрический чайник 2000Вт",
+        title: "Электрический чайник Cronier 2000Вт",
         category: "kitchen",
-        image: "electric-kettle.jpg",
-        desc: "Мощность 2000 Вт. Корпус из жаропрочного стекла с внутренней подсветкой приятного голубого цвета. Система автоотключения при закипании или отсутствии воды. Скрытый нагревательный элемент. Объём 2 литра.",
-        price: "115р"
+        hasDiscount: true,
+        oldPrice: "299.99р",
+        image: "electric-kettle-cronier.jpg",
+        desc: "Мощность 2000 Вт. Корпус из жаропрочного стекла с внутренней подсветкой приятного голубого цвета. Система автоотключения при закипании или отсутствии воды. Скрытый нагревательный элемент. Объём 2 литра. Длина провода 50см. Поворот на 360 градусов.",
+        price: "149.99р"
     },
     {
         id: 26,
@@ -637,6 +554,54 @@ const products = [
         image: "heater.jpg",
         desc: "Мощность 1000 ватт. Площадь нагрева до 25 квадратных метров. Можно поставить на стол, пол, повесить на стену. Мощный ПТК-нагреватель. Wall Mounted Mobile Air Conditioning.",
         price: "189.99р"
+    },
+    {
+        id: 29,
+        title: "Вакуумный упаковщик",
+        category: "kitchen",
+        badge: "sale",
+        badgeText: "СКИДКА 50%",
+        hasDiscount: true,
+        oldPrice: "159.99р",
+        image: "vacuum-sealer.jpg",
+        desc: "Вакуумная упаковка защищает пищу от окисления, сохраняя вкус, аромат и питательные свойства. Простой и интуитивно понятный интерфейс. Мощный насос создаёт сильный вакуум. Функция ручного режима. <b>В подарок 10 пакетов для вакуумного упаковщика.</b>",
+        price: "79.99р"
+    },
+    {
+        id: 30,
+        title: "Сушилка для овощей Proliss PRO-7001",
+        category: "kitchen",
+        badge: "new",
+        badgeText: "НОВИНКА",
+        hasDiscount: true,
+        oldPrice: "639.99р",
+        image: "food-dehydrator.jpg",
+        desc: "Позволяет сушить овощи, фрукты, ягоды, травы, мясо, делать пастилу. Сохраняет все витамины и полезные микроэлементы. <ul><li>Мощность 1200Вт</li><li>5 прозрачных поддонов</li><li>Регулировка температуры: 35°C – 70°C</li><li>Механическое управление</li><li>Крышка и кронштейн из полипропилена</li></ul>",
+        price: "319.99р"
+    },
+    {
+        id: 31,
+        title: "Смарт-часы T800 Promax Watch 8",
+        category: "other",
+        badge: "hit",
+        badgeText: "ХИТ",
+        hasDiscount: true,
+        oldPrice: "279.99р",
+        image: "smart-watch-t800.jpg",
+        desc: "Диагональ экрана 50 мм, Bluetooth 5.0. Совместимость: Android, iOS. Влагозащита IP67. <ul><li>Функции: шагомер, уведомления, погода, секундомер, таймер, музыка</li><li>Приём/сброс звонков</li><li>Напоминание об активности</li><li>Активация экрана жестом</li><li>Различные режимы спорта</li></ul>",
+        price: "139.99р"
+    },
+    {
+        id: 32,
+        title: "Планшет 4в1 Meijiahui GT40 Ultra",
+        category: "other",
+        badge: "new",
+        badgeText: "НОВИНКА",
+        hasDiscount: true,
+        oldPrice: "1159.99р",
+        image: "tablet-meijiahui.jpg",
+        desc: "<ul><li>Экран: 10.1\", IPS, HD (1280x800), 60 Гц</li><li>Память: 16 ГБ ОЗУ (с виртуальным расширением), 512 ГБ встроенной, слот для microSD (до 128 ГБ)</li><li>Процессор: 8-ядерный MediaTek, до 1.4 ГГц</li><li>Связь: 2 SIM (5G/4G/3G), Wi-Fi, Bluetooth, FM, GPS</li><li>Аккумулятор: 6000–10000 мАч, USB Type-C</li><li>Камеры: тыловая 30 Мп, фронтальная 13 Мп</li><li>ОС: Android 13 (Google Play)</li><li>Комплект: планшет, чехол-клавиатура с тачпадом, мышь, стилус</li></ul>",
+        price: "579.99р"
     }
 ];
 
@@ -666,7 +631,6 @@ function renderProducts(filteredProducts) {
                         ${p.oldPrice ? `<div class="price-old">${p.oldPrice}</div>` : ''}
                         <div class="price">${p.price}</div>
                     </div>
-                    <button class="btn-order" onclick="openModal('${p.title.replace(/'/g, "\\'")}')">Заказать</button>
                 </div>
             </div>
         </div>
@@ -693,24 +657,6 @@ function filterCategory(cat, btn) {
     btn.classList.add('active');
     filterProducts();
 }
-
-function openModal(name) {
-    document.getElementById('modalProductName').textContent = name;
-    document.getElementById('orderModal').classList.add('active');
-}
-
-function closeModal() {
-    document.getElementById('orderModal').classList.remove('active');
-}
-
-function submitOrder() {
-    alert('✅ Заказ оформлен! Мы свяжемся с вами в ближайшее время.');
-    closeModal();
-}
-
-document.getElementById('orderModal').addEventListener('click', function(e) {
-    if (e.target === this) closeModal();
-});
 
 renderProducts(products);
 </script>
