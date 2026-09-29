@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="560" viewBox="0 0 600 560" role="img" aria-labelledby="title">
+  <title id="title">Фотография товара пока не добавлена</title>
+  <rect width="600" height="560" fill="#f8f9fa"/>
+  <g fill="none" stroke="#a1adbb" stroke-width="8" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="220" y="160" width="160" height="128" rx="16"/>
+    <circle cx="262" cy="201" r="14"/>
+    <path d="m222 265 44-42 38 32 38-47 36 57"/>
+  </g>
+  <g font-family="Segoe UI,Arial,sans-serif" text-anchor="middle">
+    <text x="300" y="345" fill="#65758b" font-size="26">Фото товара</text>
+    <text x="300" y="383" fill="#8996a8" font-size="19">пока не добавлено</text>
+  </g>
+</svg>
