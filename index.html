@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Каталог товаров</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f2f5;
+            color: #333;
+        }
+
+        header {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+
+        header h1 { font-size: 2.5em; margin-bottom: 10px; letter-spacing: 2px; }
+        header p { font-size: 1.1em; opacity: 0.8; }
+
+        .search-bar {
+            max-width: 500px;
+            margin: 20px auto 0;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 14px 20px;
+            border: none;
+            border-radius: 30px;
+            font-size: 16px;
+            outline: none;
+            background: rgba(255,255,255,0.15);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .search-bar input::placeholder { color: rgba(255,255,255,0.6); }
+        .search-bar input:focus {
+            background: rgba(255,255,255,0.25);
+            border-color: rgba(255,255,255,0.4);
+        }
+
+        .categories {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding: 20px;
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .cat-btn {
+            padding: 10px 24px;
+            border: 2px solid #0f3460;
+            background: white;
+            color: #0f3460;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .cat-btn:hover, .cat-btn.active {
+            background: #0f3460;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(15,52,96,0.3);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 25px;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 35px rgba(0,0,0,0.15);
+        }
+
+        .product-image-wrapper {
+            position: relative;
+            width: 100%;
+            height: 280px;
+            background: #f8f9fa;
+            overflow: hidden;
+        }
+
+        .product-image {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            padding: 15px;
+        }
+
+        .discount-badge-img {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: linear-gradient(135deg, #e63946, #c1121f);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 800;
+            box-shadow: 0 4px 12px rgba(230,57,70,0.4);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.08); }
+        }
+
+        .product-info {
+            padding: 20px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .product-title {
+            font-size: 1.2em;
+            font-weight: 700;
+            color: #1a1a2e;
+            margin-bottom: 12px;
+            line-height: 1.3;
+        }
+
+        .product-desc {
+            font-size: 0.9em;
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            flex-grow: 1;
+        }
+
+        .product-desc ul { padding-left: 20px; margin-top: 8px; }
+        .product-desc li { margin-bottom: 4px; }
+
+        .price-section {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: auto;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+
+        .price-block { display: flex; flex-direction: column; }
+
+        .price-old {
+            font-size: 0.95em;
+            color: #999;
+            text-decoration: line-through;
+            font-weight: 400;
+        }
+
+        .price {
+            font-size: 1.6em;
+            font-weight: 800;
+            color: #e63946;
+        }
+
+        .btn-order {
+            padding: 12px 28px;
+            background: linear-gradient(135deg, #0f3460, #1a1a2e);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-order:hover {
+            background: linear-gradient(135deg, #e63946, #c1121f);
+            transform: scale(1.05);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            color: white;
+            border-radius: 12px;
+            font-size: 0.75em;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .badge.new { background: #2d6a4f; }
+        .badge.hit { background: #e63946; }
+        .badge.sale { background: #f77f00; }
+
+        footer {
+            background: #1a1a2e;
+            color: white;
+            text-align: center;
+            padding: 30px;
+            margin-top: 40px;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 60px 20px;
+            font-size: 1.2em;
+            color: #999;
+            grid-column: 1 / -1;
+        }
+
+        @media (max-width: 768px) {
+            header h1 { font-size: 1.8em; }
+            .products-grid { grid-template-columns: 1fr; }
+            .cat-btn { padding: 8px 16px; font-size: 12px; }
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal.active { display: flex; }
+
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            max-width: 500px;
+            width: 100%;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .modal-content h3 { margin-bottom: 15px; color: #1a1a2e; }
+
+        .modal-content input, .modal-content textarea {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            border: 2px solid #eee;
+            border-radius: 10px;
+            font-size: 15px;
+            outline: none;
+        }
+
+        .modal-content input:focus, .modal-content textarea:focus { border-color: #0f3460; }
+
+        .modal-content button {
+            margin-top: 15px;
+            padding: 12px 40px;
+            background: #0f3460;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            float: right;
+            font-size: 24px;
+            cursor: pointer;
+            color: #999;
+            background: none;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>🛒 КАТАЛОГ ТОВАРОВ</h1>
+    <p>Лучшие цены на бытовую технику и электроинструмент</p>
+    <div class="search-bar">
+        <input type="text" id="searchInput" placeholder="🔍 Поиск товаров..." oninput="filterProducts()">
+    </div>
+</header>
+
+<div class="categories">
+    <button class="cat-btn active" onclick="filterCategory('all', this)">Все товары</button>
+    <button class="cat-btn" onclick="filterCategory('vacuum', this)">Пылесосы</button>
+    <button class="cat-btn" onclick="filterCategory('tool', this)">Электроинструмент</button>
+    <button class="cat-btn" onclick="filterCategory('kitchen', this)">Кухонная техника</button>
+    <button class="cat-btn" onclick="filterCategory('cleaning', this)">Уборка и чистка</button>
+    <button class="cat-btn" onclick="filterCategory('other', this)">Другое</button>
+</div>
+
+<div class="container">
+    <div class="products-grid" id="productsGrid"></div>
+</div>
+
+<div class="modal" id="orderModal">
+    <div class="modal-content">
+        <button class="modal-close" onclick="closeModal()">&times;</button>
+        <h3>Оформить заказ</h3>
+        <p id="modalProductName" style="margin-bottom:15px; color:#0f3460; font-weight:600;"></p>
+        <input type="text" placeholder="Ваше имя">
+        <input type="tel" placeholder="Телефон">
+        <textarea placeholder="Комментарий к заказу" rows="3"></textarea>
+        <button onclick="submitOrder()">Отправить заказ</button>
+    </div>
+</div>
+
+<footer>
+    <p>Свяжитесь с нами для оформления заказа</p>
+    <p style="margin-top:10px; opacity:0.7;">© 2026 Каталог товаров. Все права защищены.</p>
+</footer>
+
+<script>
+const products = [
+    {
+        id: 1,
+        title: "Моющий робот-пылесос",
+        category: "vacuum",
+        badge: "sale",
+        badgeText: "СКИДКА 50%",
+        hasDiscount: true,
+        oldPrice: "699.99р",
+        image: "robot-vacuum.jpg",
+        desc: "Сухая и влажная уборка. Противоударный пластик, защита от падений. Подходит для любых поверхностей (плитка, линолеум, ламинат, паркет) и даже заезжает на ковры. Не боится шерсти домашних животных. Оснащён сенсорами и программами для навигации. <b>Южно-корейское производство.</b>",
+        price: "349.99р"
+    },
+    {
+        id: 2,
+        title: "Вертикальный моющий пылесос (беспроводной)",
+        category: "vacuum",
+        badge: "new",
+        badgeText: "НОВИНКА",
+        hasDiscount: true,
+        oldPrice: "599.99р",
+        image: "vertical-wash-vacuum.jpg",
+        desc: "<ul><li>Сила всасывания: 15 000 Па</li><li>Объём пылесборника 400 мл</li><li>Технология самофильтрации воды</li><li>Возможность добавления дезинфицирующих средств</li><li>Эргономическая ручка</li><li>До 1 часа непрерывной работы</li><li>Зарядка через Type-C</li></ul>",
+        price: "299.99р"
+    },
+    {
+        id: 4,
+        title: "Пылесос для химчистки",
+        category: "vacuum",
+        badge: "hit",
+        badgeText: "МОЩНЫЙ",
+        image: "dry-clean-vacuum.jpg",
+        desc: "Очень мощный пылесос для химчистки, имеет 32000 мощность всасывания, очищает до 8см в глубину, при этом он очень лёгкий — всего 3.5кг. Насадки: моющая, для сухой уборки, для шерсти, для стёкол, для самоочистки и для щелей.",
+        price: "449.99"
+    },
+    {
+        id: 5,
+        title: "Шуруповёрт (25 предметов)",
+        category: "tool",
+        hasDiscount: true,
+        oldPrice: "359.99р",
+        image: "screwdriver.jpg",
+        desc: "<ul><li>25 предметов в комплекте</li><li>2 литиевых аккумулятора 48 вольт с быстрой зарядкой</li><li>6 свёрел в комплекте (3 по металлу, 3 по дереву)</li><li>Головки 5-12мм, 6 бит</li><li>Гибкий удлинитель</li></ul>",
+        price: "179.99р"
+    },
+    {
+        id: 6,
+        title: "Болгарка аккумуляторная Makita",
+        category: "tool",
+        badge: "hit",
+        badgeText: "ХИТ",
+        hasDiscount: true,
+        oldPrice: "479.99р",
+        image: "grinder-makita.jpg",
+        desc: "<ul><li>Дополнительная рукоятка</li><li>Блокировка кнопки включения</li><li>Фиксация шпинделя + 3 диска 125мм</li><li>Упаковка: кейс</li><li>Макс. частота вращения: 11000 об/мин</li><li>Вес: 2.5 кг</li><li>Напряжение аккумулятора: 36В</li><li>2 аккумулятора в комплекте</li><li>Бесщёточный двигатель</li></ul>",
+        price: "239.99р"
+    },
+    {
+        id: 7,
+        title: "Гайковёрт (25 предметов)",
+        category: "tool",
+        hasDiscount: true,
+        oldPrice: "719.99р",
+        image: "impact-wrench.jpg",
+        desc: "<ul><li>Скорость вращения 2000 об/мин</li><li>Максимальный крутящий момент 812 Н.м</li><li>Частота ударов 3250 ударов/мин</li><li>2 аккумулятора 48В и 6аЧ</li><li>25 предметов в кейсе</li><li>Зарядная станция</li><li>Гибкая насадка для труднодоступных мест</li><li>Свёрла 8шт, головки 5шт, биты 10шт</li></ul>",
+        price: "359.99р"
+    },
+    {
+        id: 8,
+        title: "Циркулярная пила Makita HS 7601",
+        category: "tool",
+        badge: "new",
+        badgeText: "СУБРЕНД",
+        image: "circular-saw-makita.jpg",
+        desc: "Инструмент довольно компактный, имеет вес 4,0 кг. Мощный двигатель 1200 Вт надёжно защищён от перегрева и попадания пыли. Вращение шпинделя на холостом ходу достигает высокой скорости 5200 оборотов в минуту.",
+        price: "359.99"
+    },
+    {
+        id: 9,
+        title: "Пароочиститель (22 насадки)",
+        category: "cleaning",
+        hasDiscount: true,
+        oldPrice: "399.99р",
+        image: "steam-cleaner.jpg",
+        desc: "<ul><li>Мощность до 8000 ватт</li><li>110 градусов температура пара</li><li>12 бар давление</li><li>6 режимов работы</li><li>1300мл объём резервуара</li><li>Нагрев до 15 секунд!</li><li>Размеры 19x15x13см</li><li>28 предметов / 22 насадки</li></ul>",
+        price: "199.99р"
+    },
+    {
+        id: 10,
+        title: "Паровая швабра 3в1",
+        category: "cleaning",
+        hasDiscount: true,
+        oldPrice: "599.99р",
+        image: "steam-mop.jpg",
+        desc: "<ul><li>1300 ватт</li><li>30 секунд время нагрева</li><li>0.3л объём резервуара</li><li>120-130 градусов температура пара</li><li>9 насадок: форсунка, скребок, круглые щётки, для углов, для пола и стен, для стёкол и зеркал</li></ul>",
+        price: "299.99р"
+    },
+    {
+        id: 11,
+        title: "Робот-мойщик окон",
+        category: "cleaning",
+        badge: "hit",
+        badgeText: "ХИТ",
+        hasDiscount: true,
+        oldPrice: "739.99р",
+        image: "window-robot.jpg",
+        desc: "Автоматический робот для очистки вертикальных и горизонтальных гладких поверхностей (окна, зеркала, кафель, душевые кабины). Сила всасывания до 5600 Па. Режимы: сухая, влажная, быстрая, местная, обычная уборка. Датчики движения и лазерный дальномер. Пульт ДУ в комплекте.",
+        price: "369.99р"
+    },
+    {
+        id: 12,
+        title: "Перфоратор Makita",
+        category: "tool",
+        badge: "hit",
+        badgeText: "МОЩНЫЙ",
+        hasDiscount: true,
+        oldPrice: "699.99р",
+        image: "hammer-drill-makita.jpg",
+        desc: "Реальная альтернатива сетевым моделям благодаря силе удара в 5 Джоулей и бесщёточному двигателю. Три скорости, пять режимов работы, включая импульсный для замеса смесей. Быстросъёмный патрон. Антивибрационная рукоятка и плавный пуск. 1500Вт мощность, 6200 уд/мин.",
+        price: "349.99р"
+    },
+    {
+        id: 13,
+        title: "Электропила аккумуляторная Makita",
+        category: "tool",
+        hasDiscount: true,
+        oldPrice: "659.99р",
+        image: "chain-saw-makita.jpg",
+        desc: "Аккумуляторная цепная пила с 12-дюймовой шиной. Комплект: 2 батареи 48В, зарядное устройство, цепь и кейс. Макс. обороты холостого хода 6800 об/мин. Бесщёточный двигатель экономит энергию и продлевает срок службы.",
+        price: "329.99р"
+    },
+    {
+        id: 14,
+        title: "Лобзик",
+        category: "tool",
+        hasDiscount: true,
+        oldPrice: "619.99р",
+        image: "jigsaw.jpg",
+        desc: "Для распила дерева, фанеры, ДСП, пластика и тонкого металла. Глубина пропила: дерево до 65мм, сталь до 6мм. Электронная регулировка скорости от 500 до 3000 ход/мин. 4 режима маятникового хода. Быстрозажимной патрон SDS. Наклон подошвы 0°–45°. 100% медная обмотка двигателя.",
+        price: "309.99р"
+    },
+    {
+        id: 15,
+        title: "Кофемашина Cronier",
+        category: "kitchen",
+        badge: "hit",
+        badgeText: "ХИТ",
+        hasDiscount: true,
+        oldPrice: "859.99р",
+        image: "coffee-machine.jpg",
+        desc: "Идеально для приготовления молотого кофе, эспрессо, капучино. Контроль процесса на каждой стадии. Функция автоматического отключения. <ul><li>Мощность 1350 Вт</li><li>Максимальное давление 20 бар</li><li>Съёмный резервуар 1.6л</li></ul>",
+        price: "429.99р"
+    },
+    {
+        id: 16,
+        title: "Блендер Bosch 4в1 (6 в 1)",
+        category: "kitchen",
+        hasDiscount: true,
+        oldPrice: "359.99р",
+        image: "blender-bosch.jpg",
+        desc: "<ul><li>Мощность 1500 ватт</li><li>2 скорости</li><li>Насадки: венчик, для замешивания теста, для пюре, для нарезки кубиками, нож для колки льда, нож-измельчитель, чаша-измельчитель, насадка-миксер</li><li>Мерный стакан на 1 литр</li></ul>",
+        price: "179.99р"
+    },
+    {
+        id: 17,
+        title: "Аэрогриль (8л)",
+        category: "kitchen",
+        badge: "new",
+        badgeText: "НОВИНКА",
+        hasDiscount: true,
+        oldPrice: "619.99р",
+        image: "air-fryer.jpg",
+        desc: "Идеальное решение для быстрого и здорового приготовления блюд. Равномерное распределение горячего воздуха обеспечивает хрустящую корочку. Объём камеры до 8 литров. 12 различных рецептов готовки. Антипригарное покрытие.",
+        price: "309.99р"
+    },
+    {
+        id: 18,
+        title: "Рубанок электро",
+        category: "tool",
+        hasDiscount: true,
+        oldPrice: "539.99р",
+        image: "electric-planer.jpg",
+        desc: "Незаменимый инструмент для качественной и быстрой обработки деревянных поверхностей. Подходит для профессионалов и любителей. <ul><li>Мощность 600 Вт</li><li>Глубина погружения ножа 0–3 мм</li><li>Защита от пыли</li><li>Эргономичная рукоять</li><li>Лимитатор глубины</li></ul>",
+        price: "269.99р"
+    },
+    {
+        id: 19,
+        title: "Мойка аккумуляторная Makita",
+        category: "tool",
+        badge: "sale",
+        badgeText: "СКИДКА",
+        hasDiscount: true,
+        oldPrice: "299.99р",
+        image: "pressure-washer-makita.jpg",
+        desc: "Отличный помощник для тех, кто ценит мобильность. Работает без шлангов и подключений. <ul><li>1000 ватт, давление 30 бар</li><li>Ёмкость до 20 литров</li><li>Подходит для мойки машин, стен и забора</li><li>2 аккумулятора 48В</li><li>Насадки, кейс и зарядное устройство</li></ul>",
+        price: "149.99р"
+    },
+    {
+        id: 20,
+        title: "Лазерный уровень 3D-4D Makita",
+        category: "tool",
+        badge: "hit",
+        badgeText: "ПРОФИ",
+        hasDiscount: true,
+        oldPrice: "639.99р",
+        image: "laser-level.jpg",
+        desc: "Профессиональный лазерный уровень. Эффект работы 3D-4D. 12 линий на 360 градусов. Погрешность до 2мм на 10 метров. Комплектация: переносная сумка, лазерный уровень, тринога, 2 аккумулятора 2400мА по 3.7V, пластина для крепления к стене.",
+        price: "319.99р"
+    },
+    {
+        id: 21,
+        title: "Мультиварка ORVICA",
+        category: "kitchen",
+        hasDiscount: true,
+        oldPrice: "799.99р",
+        image: "multicooker.jpg",
+        desc: "Компактные размеры, рассчитана на 4-6 человек. Объём 6 литров. Мощность 2000Вт, 12 программ для различного приготовления. Варите каши, готовьте первые блюда, тушите мясо и многое другое.",
+        price: "399.99р"
+    },
+    {
+        id: 22,
+        title: "Электрическая мясорубка Luma Bella",
+        category: "kitchen",
+        badge: "hit",
+        badgeText: "МОЩНАЯ",
+        hasDiscount: true,
+        oldPrice: "799.99р",
+        image: "meat-grinder.jpg",
+        desc: "<ul><li>Мощность 3000 Вт</li><li>Медный двигатель с защитой от перегрузок</li><li>Производительность: до 2 кг фарша в минуту</li><li>Корпус: ударопрочный пластик + нержавеющая сталь</li><li>Механическое управление (вкл/выкл + Реверс)</li><li>Диски для фарша разной консистенции, насадки для колбас и кебабов</li></ul>",
+        price: "399.99р"
+    },
+    {
+        id: 23,
+        title: "Электрический Гриль Proliss",
+        category: "kitchen",
+        image: "electric-grill.jpg",
+        desc: "Предназначен для приготовления стейков. Антипригарное покрытие позволяет готовить без масла. Рабочая поверхность гриля изготовлена из металла. Series Wizard AID, 2000Вт.",
+        price: "209.99"
+    },
+    {
+        id: 24,
+        title: "Кофемолка Nima NM-8300",
+        category: "kitchen",
+        badge: "sale",
+        badgeText: "ВЫГОДНО",
+        hasDiscount: true,
+        oldPrice: "149.99р",
+        image: "coffee-grinder.jpg",
+        desc: "Прочный пластиковый корпус с металлической чашей и лезвием из нержавеющей стали. Удобная кнопка вкл/выкл. Прозрачная крышка. 150Вт. Подходит для помола кофе, сахара, специй и других ингредиентов.",
+        price: "74.99р"
+    },
+    {
+        id: 25,
+        title: "Электрический чайник 2000Вт",
+        category: "kitchen",
+        image: "electric-kettle.jpg",
+        desc: "Мощность 2000 Вт. Корпус из жаропрочного стекла с внутренней подсветкой приятного голубого цвета. Система автоотключения при закипании или отсутствии воды. Скрытый нагревательный элемент. Объём 2 литра.",
+        price: "115р"
+    },
+    {
+        id: 26,
+        title: "Кухонный комбайн ORVICA 10в1",
+        category: "kitchen",
+        badge: "hit",
+        badgeText: "10 В 1",
+        hasDiscount: true,
+        oldPrice: "859.99р",
+        image: "kitchen-combain.jpg",
+        desc: "Многофункциональный помощник на кухне. Мощный 2400-ваттный мотор. 6 насадок: взбивать, смешивать, измельчать, шинковать. Мерный стакан 0.5л, чаша измельчителя 0.4л. 2 скорости. Защита от перегрева. Комплектация: мерный стакан, мешалка, миксер, измельчитель, венчик, капучинатор, блендер, овощерезка, слейсер, доп чаша.",
+        price: "429.99р"
+    },
+    {
+        id: 27,
+        title: "Фен Дайсон (реплика) Sepersonic HD007",
+        category: "other",
+        badge: "hit",
+        badgeText: "ЛЮКС",
+        hasDiscount: true,
+        oldPrice: "499.99р",
+        image: "hair-dryer-dyson.jpg",
+        desc: "Профессиональный фен (люксовая реплика). Функция ионизации снимает статическое электричество. Подача холодного воздуха. <ul><li>Мощность 1600 ватт</li><li>4 режима работы</li><li>3 скорости + холодный воздух</li><li>5 насадок: концентратор, диффузор, для непослушных волос, для бережного высушивания, для направленного потока</li></ul>",
+        price: "249.99р"
+    },
+    {
+        id: 28,
+        title: "Обогреватель-кондиционер",
+        category: "other",
+        badge: "new",
+        badgeText: "НОВИНКА",
+        hasDiscount: true,
+        oldPrice: "379.99р",
+        image: "heater.jpg",
+        desc: "Мощность 1000 ватт. Площадь нагрева до 25 квадратных метров. Можно поставить на стол, пол, повесить на стену. Мощный ПТК-нагреватель. Wall Mounted Mobile Air Conditioning.",
+        price: "189.99р"
+    }
+];
+
+let currentCategory = 'all';
+
+function renderProducts(filteredProducts) {
+    const grid = document.getElementById('productsGrid');
+
+    if (filteredProducts.length === 0) {
+        grid.innerHTML = '<div class="no-results">😔 Товары не найдены. Попробуйте другой запрос.</div>';
+        return;
+    }
+
+    grid.innerHTML = filteredProducts.map(p => `
+        <div class="product-card" data-category="${p.category}">
+            <div class="product-image-wrapper">
+                <img class="product-image" src="${p.image}" alt="${p.title}" loading="lazy"
+                     onerror="this.onerror=null;this.src='./assets/no-image.svg'">
+                ${p.hasDiscount ? '<div class="discount-badge-img">-50%</div>' : ''}
+            </div>
+            <div class="product-info">
+                ${p.badge ? `<span class="badge ${p.badge}">${p.badgeText}</span>` : ''}
+                <div class="product-title">${p.title}</div>
+                <div class="product-desc">${p.desc}</div>
+                <div class="price-section">
+                    <div class="price-block">
+                        ${p.oldPrice ? `<div class="price-old">${p.oldPrice}</div>` : ''}
+                        <div class="price">${p.price}</div>
+                    </div>
+                    <button class="btn-order" onclick="openModal('${p.title.replace(/'/g, "\\'")}')">Заказать</button>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+function filterProducts() {
+    const query = document.getElementById('searchInput').value.toLowerCase();
+    let filtered = products.filter(p =>
+        p.title.toLowerCase().includes(query) ||
+        p.desc.toLowerCase().includes(query)
+    );
+
+    if (currentCategory !== 'all') {
+        filtered = filtered.filter(p => p.category === currentCategory);
+    }
+
+    renderProducts(filtered);
+}
+
+function filterCategory(cat, btn) {
+    currentCategory = cat;
+    document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    filterProducts();
+}
+
+function openModal(name) {
+    document.getElementById('modalProductName').textContent = name;
+    document.getElementById('orderModal').classList.add('active');
+}
+
+function closeModal() {
+    document.getElementById('orderModal').classList.remove('active');
+}
+
+function submitOrder() {
+    alert('✅ Заказ оформлен! Мы свяжемся с вами в ближайшее время.');
+    closeModal();
+}
+
+document.getElementById('orderModal').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+});
+
+renderProducts(products);
+</script>
+
+</body>
+</html>
